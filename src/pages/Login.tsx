@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { Eye, EyeOff } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,6 +15,7 @@ const isSupabaseConfigured = Boolean(
 export function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
@@ -22,8 +24,9 @@ export function Login() {
     e.preventDefault()
     
     if (!isSupabaseConfigured) {
-      alert("Using Mock Data Layer. Logging in bypass...")
-      navigate('/dashboard')
+      localStorage.setItem('erp_session', JSON.stringify({ access_token: 'dummy' }))
+      localStorage.setItem('erp_user', JSON.stringify({ id: 'dummy', email }))
+      window.location.href = '/'
       return
     }
 
@@ -46,7 +49,7 @@ export function Login() {
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-muted/40 px-4">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-md shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>
@@ -76,13 +79,22 @@ export function Login() {
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
               </div>
-              <Input
-                id="password"
-                type="password"
-                required={isSupabaseConfigured}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required={isSupabaseConfigured}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-4">
