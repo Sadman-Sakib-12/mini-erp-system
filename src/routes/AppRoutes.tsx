@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from '@/components/layout/Layout'
 import { ProtectedRoute } from './ProtectedRoute'
 
@@ -11,6 +11,7 @@ import { Suppliers } from '@/pages/Suppliers'
 import { Purchases } from '@/pages/Purchases'
 import { Sales } from '@/pages/Sales'
 import { Reports } from '@/pages/Reports'
+import { Users } from '@/pages/Users'
 
 export function AppRoutes() {
   return (
@@ -20,9 +21,11 @@ export function AppRoutes() {
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         {/* Accessible by everyone (Admin & Staff) */}
         <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
         <Route path="/products" element={<Products />} />
         <Route path="/customers" element={<Customers />} />
         <Route path="/sales" element={<Sales />} />
+        <Route path="/users" element={<Users />} />
 
         {/* Admin ONLY Routes */}
         <Route path="/suppliers" element={<ProtectedRoute allowedRoles={['Admin']}><Suppliers /></ProtectedRoute>} />

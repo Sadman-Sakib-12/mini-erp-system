@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 const isSupabaseConfigured = Boolean(
-  import.meta.env.VITE_SUPABASE_URL && 
+  import.meta.env.VITE_SUPABASE_URL &&
   import.meta.env.VITE_SUPABASE_URL !== 'your_supabase_project_url_here'
 )
 
@@ -25,7 +25,7 @@ export function Register() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (password.length < 8) {
       setError('Password must be at least 8 characters long')
       return
@@ -35,7 +35,7 @@ export function Register() {
       setError('Passwords do not match')
       return
     }
-    
+
     if (!isSupabaseConfigured) {
       alert("Using Mock Data Layer. Registering bypass...")
       navigate('/login')
@@ -44,7 +44,7 @@ export function Register() {
 
     setLoading(true)
     setError(null)
-    
+
     try {
       const { error } = await supabase.auth.signUp({
         email,
@@ -55,7 +55,14 @@ export function Register() {
           }
         }
       })
-      if (error) throw error
+      if (error) {
+        if (error.message.includes('already registered') || error.message.includes('already exists')) {
+          alert('Demo account already exists! Redirecting to login...')
+          navigate('/login')
+          return
+        }
+        throw error
+      }
       alert('Registration successful! If you have email confirmations enabled, please check your email.')
       navigate('/login')
     } catch (err: any) {
@@ -82,7 +89,16 @@ export function Register() {
         <form onSubmit={handleRegister}>
           <CardContent className="grid gap-4">
             {error && <div className="text-sm text-destructive font-medium">{error}</div>}
-            
+
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" className="w-full text-xs" onClick={() => { setName('Admin User'); setEmail('admin@erp.com'); setPassword('password123'); setConfirmPassword('password123'); }}>
+                Demo Admin
+              </Button>
+              <Button type="button" variant="outline" className="w-full text-xs" onClick={() => { setName('Staff User'); setEmail('staff@erp.com'); setPassword('password123'); setConfirmPassword('password123'); }}>
+                Demo Staff
+              </Button>
+            </div>
+
             <div className="grid gap-2">
               <Label htmlFor="name">Full Name</Label>
               <Input

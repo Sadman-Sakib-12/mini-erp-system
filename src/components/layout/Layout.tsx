@@ -1,6 +1,6 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import { Package, Users, Truck, ShoppingCart, Banknote, LogOut, LayoutDashboard, BarChart3 } from 'lucide-react'
+import { Package, Users, Truck, ShoppingCart, Banknote, LogOut, LayoutDashboard, BarChart3, UserCog } from 'lucide-react'
 
 export function Layout() {
   const { signOut, user, role } = useAuth()
@@ -20,6 +20,7 @@ export function Layout() {
     { name: 'Purchases', path: '/purchases', icon: ShoppingCart, roles: ['Admin'] },
     { name: 'Sales', path: '/sales', icon: Banknote, roles: ['Admin', 'Staff'] },
     { name: 'Reports', path: '/reports', icon: BarChart3, roles: ['Admin'] },
+    { name: 'Users', path: '/users', icon: UserCog, roles: ['Admin', 'Staff'] },
   ]
 
   return (

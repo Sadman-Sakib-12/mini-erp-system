@@ -38,4 +38,18 @@ export const ProductService = {
     localStorage.setItem('erp_products', JSON.stringify(products.filter(p => p.id !== id)))
     return true
   },
+
+  async updateProduct(id: string, product: Partial<Product>): Promise<Product> {
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase.from('products').update(product).eq('id', id).select()
+      if (error) throw error
+      return data[0]
+    }
+    const products = await this.getProducts()
+    const index = products.findIndex(p => p.id === id)
+    if (index === -1) throw new Error('Not found')
+    products[index] = { ...products[index], ...product }
+    localStorage.setItem('erp_products', JSON.stringify(products))
+    return products[index]
+  },
 }

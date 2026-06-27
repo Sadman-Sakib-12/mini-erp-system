@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, Plus, Trash2 } from 'lucide-react'
+import { Users, Plus, Trash2, Pencil, X } from 'lucide-react'
 import type { Customer } from '@/types'
 
 export function Customers() {
@@ -16,6 +16,7 @@ export function Customers() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   useEffect(() => {
     loadCustomers()
@@ -33,13 +34,15 @@ export function Customers() {
     }
   }
 
-  const handleAdd = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await CustomerService.addCustomer({
-        name,
-        email,
-        phone })
+      if (editingId) {
+        await CustomerService.updateCustomer(editingId, { name, email, phone })
+        setEditingId(null)
+      } else {
+        await CustomerService.addCustomer({ name, email, phone })
+      }
       setName('')
       setEmail('')
       setPhone('')
@@ -47,6 +50,20 @@ export function Customers() {
     } catch (error) {
       console.error(error)
     }
+  }
+
+  const handleEdit = (c: Customer) => {
+    setEditingId(c.id)
+    setName(c.name)
+    setEmail(c.email)
+    setPhone(c.phone)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingId(null)
+    setName('')
+    setEmail('')
+    setPhone('')
   }
 
   const handleDelete = async (id: string) => {
@@ -68,10 +85,10 @@ export function Customers() {
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-1 h-fit">
           <CardHeader>
-            <CardTitle>Add Customer</CardTitle>
+            <CardTitle>{editingId ? 'Edit Customer' : 'Add Customer'}</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAdd} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
                 <Input id="name" required value={name} onChange={e => setName(e.target.value)} />
@@ -84,9 +101,17 @@ export function Customers() {
                 <Label htmlFor="phone">Phone</Label>
                 <Input id="phone" value={phone} onChange={e => setPhone(e.target.value)} />
               </div>
-              <Button type="submit" className="w-full">
-                <Plus className="mr-2 h-4 w-4" /> Add
-              </Button>
+              <div className="flex gap-2">
+                <Button type="submit" className="flex-1">
+                  {editingId ? <Pencil className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
+                  {editingId ? 'Update' : 'Add'}
+                </Button>
+                {editingId && (
+                  <Button type="button" variant="outline" onClick={handleCancelEdit}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </form>
           </CardContent>
         </Card>
@@ -128,6 +153,9 @@ export function Customers() {
                         <td className="p-4">{c.email}</td>
                         <td className="p-4">{c.phone}</td>
                         <td className="p-4 text-right">
+                          <Button variant="ghost" size="icon" onClick={() => handleEdit(c)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleDelete(c.id)}>
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>

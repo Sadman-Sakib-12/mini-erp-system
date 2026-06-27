@@ -38,4 +38,18 @@ export const SupplierService = {
     localStorage.setItem('erp_suppliers', JSON.stringify(suppliers.filter(s => s.id !== id)))
     return true
   },
+
+  async updateSupplier(id: string, supplier: Partial<Supplier>): Promise<Supplier> {
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase.from('suppliers').update(supplier).eq('id', id).select()
+      if (error) throw error
+      return data[0]
+    }
+    const suppliers = await this.getSuppliers()
+    const index = suppliers.findIndex(s => s.id === id)
+    if (index === -1) throw new Error('Not found')
+    suppliers[index] = { ...suppliers[index], ...supplier }
+    localStorage.setItem('erp_suppliers', JSON.stringify(suppliers))
+    return suppliers[index]
+  },
 }

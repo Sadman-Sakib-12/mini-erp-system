@@ -12,6 +12,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
+  role: null,
   signOut: async () => {},
 })
 
@@ -27,13 +28,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    async function fetchUserRole(u: User | null) {
+      if (!u) return null;
+      if (!isSupabaseConfigured) {
+        return u.email?.toLowerCase().includes('admin') ? 'Admin' : 'Staff';
+      }
+      try {
+        const { data, error } = await supabase.from('profiles').select('role').eq('id', u.id).maybeSingle();
+        if (error) {
+          console.error('Error fetching profile:', error);
+        }
+        if (data) return data.role as 'Admin' | 'Staff';
+      } catch (err) {
+        console.error('Exception fetching role:', err);
+      }
+      return u.email?.toLowerCase().includes('admin') ? 'Admin' : 'Staff';
+    }
+
     async function initializeAuth() {
       if (isSupabaseConfigured) {
         const { data: { session } } = await supabase.auth.getSession()
         setSession(session)
         const sessionUser = session?.user ?? null
         setUser(sessionUser)
-        setRole(sessionUser?.email?.includes('admin') ? 'Admin' : 'Staff')
+        setRole(await fetchUserRole(sessionUser))
       } else {
         const savedSession = localStorage.getItem('erp_session')
         const savedUser = localStorage.getItem('erp_user')
@@ -41,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSession(JSON.parse(savedSession))
           const parsedUser = JSON.parse(savedUser)
           setUser(parsedUser)
-          setRole(parsedUser?.email?.includes('admin') ? 'Admin' : 'Staff')
+          setRole(parsedUser?.email?.toLowerCase().includes('admin') ? 'Admin' : 'Staff')
         }
       }
       setLoading(false)
@@ -51,11 +69,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, _session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, _session) => {
       setSession(_session)
       const sessionUser = _session?.user ?? null
       setUser(sessionUser)
-      setRole(sessionUser?.email?.includes('admin') ? 'Admin' : 'Staff')
+      setRole(await fetchUserRole(sessionUser))
       setLoading(false)
     })
 
@@ -85,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   return useContext(AuthContext)
 }

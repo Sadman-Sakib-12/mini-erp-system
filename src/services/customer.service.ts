@@ -38,4 +38,18 @@ export const CustomerService = {
     localStorage.setItem('erp_customers', JSON.stringify(customers.filter(c => c.id !== id)))
     return true
   },
+
+  async updateCustomer(id: string, customer: Partial<Customer>): Promise<Customer> {
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase.from('customers').update(customer).eq('id', id).select()
+      if (error) throw error
+      return data[0]
+    }
+    const customers = await this.getCustomers()
+    const index = customers.findIndex(c => c.id === id)
+    if (index === -1) throw new Error('Not found')
+    customers[index] = { ...customers[index], ...customer }
+    localStorage.setItem('erp_customers', JSON.stringify(customers))
+    return customers[index]
+  },
 }

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, Plus, Trash2 } from 'lucide-react'
+import { Package, Plus, Trash2, Pencil, X } from 'lucide-react'
 
 export function Products() {
   const [products, setProducts] = useState<any[]>([])
@@ -15,6 +15,7 @@ export function Products() {
   const [sku, setSku] = useState('')
   const [price, setPrice] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   useEffect(() => {
     loadProducts()
@@ -33,23 +34,46 @@ export function Products() {
     }
   }
 
-  const handleAdd = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await ProductService.addProduct({
-        name,
-        sku,
-        price: parseFloat(price),
-        stock_quantity: 0
-      })
+      if (editingId) {
+        await ProductService.updateProduct(editingId, {
+          name,
+          sku,
+          price: parseFloat(price)
+        })
+        setEditingId(null)
+      } else {
+        await ProductService.addProduct({
+          name,
+          sku,
+          price: parseFloat(price),
+          stock_quantity: 0
+        })
+      }
       setName('')
       setSku('')
       setPrice('')
       loadProducts()
     } catch (error) {
       console.error(error)
-      alert("Failed to add product")
+      alert("Failed to save product")
     }
+  }
+
+  const handleEdit = (product: any) => {
+    setEditingId(product.id)
+    setName(product.name)
+    setSku(product.sku)
+    setPrice(product.price.toString())
+  }
+
+  const handleCancelEdit = () => {
+    setEditingId(null)
+    setName('')
+    setSku('')
+    setPrice('')
   }
 
   const handleDelete = async (id: string) => {
@@ -73,10 +97,10 @@ export function Products() {
         {/* Add Product Form */}
         <Card className="md:col-span-1 h-fit">
           <CardHeader>
-            <CardTitle>Add New Product</CardTitle>
+            <CardTitle>{editingId ? 'Edit Product' : 'Add New Product'}</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAdd} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Product Name</Label>
                 <Input id="name" required value={name} onChange={e => setName(e.target.value)} />
@@ -89,9 +113,17 @@ export function Products() {
                 <Label htmlFor="price">Price ($)</Label>
                 <Input id="price" type="number" step="0.01" required value={price} onChange={e => setPrice(e.target.value)} />
               </div>
-              <Button type="submit" className="w-full">
-                <Plus className="mr-2 h-4 w-4" /> Add Product
-              </Button>
+              <div className="flex gap-2">
+                <Button type="submit" className="flex-1">
+                  {editingId ? <Pencil className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
+                  {editingId ? 'Update' : 'Add'}
+                </Button>
+                {editingId && (
+                  <Button type="button" variant="outline" onClick={handleCancelEdit}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </form>
           </CardContent>
         </Card>
@@ -140,6 +172,9 @@ export function Products() {
                           </span>
                         </td>
                         <td className="p-4 align-middle text-right">
+                          <Button variant="ghost" size="icon" onClick={() => handleEdit(product)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
