@@ -1,32 +1,164 @@
-# React + TypeScript + Vite
+# Mini ERP System
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A modern **Mini ERP (Enterprise Resource Planning) System** built with **React, TypeScript, Vite, Tailwind CSS, Shadcn UI, and Supabase**. The application provides inventory management, purchase & sales tracking, customer and supplier management, invoice generation, and role-based authentication.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Live Demo
 
-## React Compiler
+**Live URL:** https://mini-erp-system-omega.vercel.app/
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## GitHub Repository
 
-## Expanding the Oxlint configuration
+https://github.com/Sadman-Sakib-12/mini-erp-system
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+---
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## Features
+
+* User Authentication (Supabase Auth)
+* Role-Based Access Control (Admin & Staff)
+* Dashboard with business overview
+* Product Management (CRUD)
+* Customer Management
+* Supplier Management
+* Purchase Management
+* Sales Management
+* Automatic Inventory Updates
+* PDF Invoice Generation
+* Responsive UI
+* Protected Routes
+* Clean Service-Based Architecture
+
+---
+
+## Tech Stack
+
+### Frontend
+
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* Shadcn UI
+* React Router DOM
+
+### Backend & Database
+
+* Supabase
+* PostgreSQL
+* Row Level Security (RLS)
+* Database Triggers
+
+### Other Libraries
+
+* jsPDF
+* React Hook Form
+* Zod
+* Lucide React
+
+---
+
+## Project Structure
+
+```text
+src/
+│
+├── components/
+├── pages/
+├── routes/
+├── services/
+├── hooks/
+├── lib/
+├── types/
+├── layouts/
+└── utils/
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+---
+
+## Architecture
+
+The project follows a modular and scalable architecture.
+
+* Component-based UI
+* Service layer for database operations
+* Protected routing
+* Type-safe development using TypeScript
+* PostgreSQL Triggers for automatic stock management
+* Row Level Security (RLS) for secure data access
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root.
+
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+---
+
+## Installation
+
+Clone the repository
+
+```bash
+git clone https://github.com/Sadman-Sakib-12/mini-erp-system.git
+```
+
+Navigate into the project
+
+```bash
+cd mini-erp-system
+```
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Start the development server
+
+```bash
+npm run dev
+```
+
+Build for production
+
+```bash
+npm run build
+```
+
+Preview production build
+
+```bash
+npm run preview
+```
+
+---
+
+## AI-Assisted Development
+
+This project was developed using an AI-assisted workflow with:
+
+* ChatGPT
+* Gemini
+* Cursor
+* Windsurf
+* Google Antigravity IDE
+
+The AI tools were used to accelerate development, while project architecture, integration, debugging, testing, and final validation were completed through iterative development.
+
+---
+
+## Author
+
+**Sadman Sakib**
+
+MERN Stack Developer
+
+GitHub: https://github.com/Sadman-Sakib-12
